@@ -1,0 +1,97 @@
+<html>
+<head>
+<style type="text/css">
+.dt {
+	margin-left: auto;
+	margin-right: auto;
+}
+</style>
+<link rel="stylesheet" type="text/css"
+	href="https://cdn.datatables.net/1.10.15/css/jquery.dataTables.min.css">
+<script src="//code.jquery.com/jquery-1.12.4.js"></script>
+<script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
+<script>
+  // Handler for displaying the creationDate in human readable form
+  function creationDateRenderer(data, type, row, meta) {
+    if (type == "display") {
+      var d = new Date(data * 1000);
+      return d.toISOString();
+    }
+    // otherwise just return the numeric data
+    return data;
+  }
+
+  function msisdnRenderer(data, type, row, meta) {
+    if ( type == "display" ) {
+      return "<a href=\"?pn=" + data + "\">" + data + "</a>";
+    }
+    return data;
+  }
+  // When the DOM is ready  start 
+  $(document).ready(function() {
+
+    // Handle the row click
+    function rowClickHandler() {
+      // Ask DataTables which data row this is
+      var data = dt.row(this).data();
+
+      alert('You clicked the row for MSISDN=' + data.msisdn);
+    }
+
+    function ajaxHandler(data, cb, settings) {
+      function successHandler(data) {
+        if (data.status === 'Success') {
+          cb(data);
+        } else {
+          // error
+        }
+      }
+      // send ajax call
+      $.ajax();
+    }
+
+    // Prepare the data table rendering
+    var dt = $('#example').DataTable({
+      ajax : {
+        "url" : "/cgi-bin/ajax.pl",
+        "method" : "POST"
+      },
+      serverSide : true,
+      pageLength : 10,
+      lengthMenu : [ 1, 5, 10, 50, 100, 1000 ],
+      regex : true,
+      info : false,
+      ordering : false,
+      pagingType : "simple",
+      columns : [ {
+        "title" : "Row",
+        "data" : "row"
+      }, {
+        "title" : "AOR",
+        "data" : "aor",
+      }, {
+        "title" : "IMSI",
+        "data" : "imsi",
+      }, {
+        "title" : "MSISDN",
+        "data" : "msisdn",
+        render : msisdnRenderer
+      }, {
+        "title" : "Operator ID",
+        "data" : "operatorId",
+      }, {
+        "title" : "Creation Date",
+        "data" : "creationDate",
+        render : creationDateRenderer
+      }, ]
+    });
+
+    // Use jQuery's delegated API to apply click handling
+    // dt.on('click', 'tr', rowClickHandler);
+  });
+</script>
+</head>
+<body>
+	<table id="example" class="display dt hover"></table>
+</body>
+</html>
