@@ -21,9 +21,16 @@
     return data;
   }
 
+  function imsiRenderer(data, type, row, meta) {
+    if ( type == "display" ) {
+      return "<a href=\"?imsi=" + encodeURIComponent(data) + "\">" + encodeURI(data) + "</a>";
+    }
+    return data;
+  }
+
   function msisdnRenderer(data, type, row, meta) {
     if ( type == "display" ) {
-      return "<a href=\"?pn=" + data + "\">" + data + "</a>";
+      return "<a href=\"?msisdn=" + encodeURIComponent(data) + "\">" + encodeURI(data) + "</a>";
     }
     return data;
   }
@@ -72,6 +79,7 @@
       }, {
         "title" : "IMSI",
         "data" : "imsi",
+        render : imsiRenderer
       }, {
         "title" : "MSISDN",
         "data" : "msisdn",
