@@ -3,153 +3,155 @@
 use strict;
 use warnings FATAL => "all";
 
+use local::lib('/home/eldon.olmstead/examples/cgi-bin/perl5');
 use Template;
 use JSON;
 
 use CGI;
 
 sub process {
-    my $cgi = CGI->new();
 
-    my $tt = Template->new(
-        'STRICT' => 1,
+  # create reference to CGI module N.B., this module is deprecated for a while now
+  my $cgi = CGI->new();
 
-        #    'DEBUG' => 'dirs',
-        #    'DEBUG_FORMAT' => '// $file line $line : $text',
-    );
+  # Create Template Toolkit reference.
+  my $tt = Template->new(
+    'STRICT' => 1,
 
-    my @tns;
-    my $max = 1026;
+    #    'DEBUG' => 'dirs',
+    #    'DEBUG_FORMAT' => '// $file line $line : $text',
+  );
 
-    for ( my $i = 0 ; $i < $max - 3 ; $i++ ) {
+  my @tns;
+  my $max = 1026;
 
-        my $pn = "1613456" . sprintf( "%.4d", $i );
+  for ( my $i = 0 ; $i < $max - 3 ; $i++ ) {
 
-        my $row = {
-            "row"          => $i + 4,
-            "aor"          => "sip:+$pn\@newpace.com",
-            "imsi"         => "$pn",
-            "msisdn"       => "+$pn",
-            "operatorId"   => "201",
-            "creationDate" => "1493900876"
-        };
-        push( @tns, $row );
-    }
+    my $pn = "1613456" . sprintf( "%.4d", $i );
 
-    my $data = [
-        {
-            "row"          => 1,
-            "aor"          => "sip:+16132607803\@newpace.com",
-            "imsi"         => "16132607803",
-            "msisdn"       => "+16132607803",
-            "operatorId"   => "201",
-            "creationDate" => "1497531156"
-        },
-        {
-            "row"          => 2,
-            "aor"          => "sip:+16132624318\@newpace.com",
-            "imsi"         => "6132624318",
-            "msisdn"       => "+16132624318",
-            "operatorId"   => "201",
-            "creationDate" => "1493900876"
-        },
-        {
-            "row"          => 3,
-            "aor"          => "sip:+16138572750\@newpace.com",
-            "imsi"         => "6138572750",
-            "msisdn"       => "+16138572750",
-            "operatorId"   => "201",
-            "creationDate" => "1493738542"
-        }
-    ];
-
-    push( @$data, @tns );
-
-    my $total = @$data;
-
-    my $db = {
-        "draw" => '"' . int( $cgi->param("draw") ) . '"',
-
-        #  "recordsTotal" => $total,
-        "status" => "Success"
+    my $row = {
+      "row"          => $i + 4,
+      "aor"          => "sip:+$pn\@newpace.com",
+      "imsi"         => "$pn",
+      "msisdn"       => "+$pn",
+      "operatorId"   => "201",
+      "creationDate" => "1493900876"
     };
-    my $search = $cgi->param('search[value]');
-    if ( defined($search) ) {
-        print STDERR "Filtering imsi by: $search\n";
+    push( @tns, $row );
+  }
+
+  my $data = [
+    {
+      "row"          => 1,
+      "aor"          => "sip:+16132607803\@newpace.com",
+      "imsi"         => "16132607803",
+      "msisdn"       => "+16132607803",
+      "operatorId"   => "201",
+      "creationDate" => "1497531156"
+    },
+    {
+      "row"          => 2,
+      "aor"          => "sip:+16132624318\@newpace.com",
+      "imsi"         => "6132624318",
+      "msisdn"       => "+16132624318",
+      "operatorId"   => "201",
+      "creationDate" => "1493900876"
+    },
+    {
+      "row"          => 3,
+      "aor"          => "sip:+16138572750\@newpace.com",
+      "imsi"         => "6138572750",
+      "msisdn"       => "+16138572750",
+      "operatorId"   => "201",
+      "creationDate" => "1493738542"
     }
+  ];
 
-    my $start  = int( $cgi->param('start') );
-    my $length = int( $cgi->param('length') );
-    my $end    = $start + $length - 1;
+  push( @$data, @tns );
 
-    my @filtered;
-    if ( defined($search) && $search ne "" ) {
-        @filtered = ( grep { $_->{imsi} =~ /^$search/ } @$data );
-    }
-    else {
-        @filtered = @$data;
-    }
+  my $total = @$data;
 
-    my $total_filtered = @filtered;
-    my $counter        = 1;
-    map { $_->{"row"} = $counter++ } @filtered;
+  my $db = {
+    "draw" => '"' . int( $cgi->param("draw") ) . '"',
 
-    # determine the slice
-    if ( $total_filtered < $end ) {
+    #  "recordsTotal" => $total,
+    "status" => "Success"
+  };
+  my $search = $cgi->param('search[value]');
+  if ( defined($search) ) {
+    print STDERR "Filtering imsi by: $search\n";
+  }
 
-        # $end = $total_filtered - 1;
-    }
+  my $start  = int( $cgi->param('start') );
+  my $length = int( $cgi->param('length') );
+  my $end    = $start + $length - 1;
 
-    # compute array slice and filter out nulls
-    my @slice = grep defined $_, (@filtered)[ $start .. $end ];
+  my @filtered;
+  if ( defined($search) && $search ne "" ) {
+    @filtered = ( grep { $_->{imsi} =~ /^$search/ } @$data );
+  }
+  else {
+    @filtered = @$data;
+  }
 
-    # current length
-    my $total_slice = @slice;
+  my $total_filtered = @filtered;
+  my $counter        = 1;
+  map { $_->{"row"} = $counter++ } @filtered;
 
-    # Add starting point
-    my $recordsFiltered = $start + $total_slice;
+  # determine the slice
+  if ( $total_filtered < $end ) {
 
-    if ( $recordsFiltered < $total_filtered ) {
-        $db->{"recordsFiltered"} = $recordsFiltered + 1;
-    }
-    else {
-        $db->{"recordsFiltered"} = $recordsFiltered;
-    }
+    # $end = $total_filtered - 1;
+  }
 
-    # add data slice
-    $db->{"data"} = [@slice];
+  # compute array slice and filter out nulls
+  my @slice = grep defined $_, (@filtered)[ $start .. $end ];
 
-    my $dbobj = new JSON;
+  # current length
+  my $total_slice = @slice;
 
-    my $content = $dbobj->pretty(1)->encode($db);
+  # Add starting point
+  my $recordsFiltered = $start + $total_slice;
 
-    my $content_length = length($content);
+  if ( $recordsFiltered < $total_filtered ) {
+    $db->{"recordsFiltered"} = $recordsFiltered + 1;
+  }
+  else {
+    $db->{"recordsFiltered"} = $recordsFiltered;
+  }
 
-    print "Status: 200 Ok\r\n";
-    print "Content-Length: $content_length\r\n";
-    print "Content-type: application/json\r\n";
-    print "\r\n";
+  # add data slice
+  $db->{"data"} = [@slice];
 
-    print $content;
+  my $dbobj = new JSON;
+
+  my $content = $dbobj->pretty(1)->encode($db);
+
+  my $content_length = length($content);
+
+  print "Status: 200 Ok\r\n";
+  print "Content-Length: $content_length\r\n";
+  print "Content-type: application/json\r\n";
+  print "\r\n";
+
+  print $content;
 }
 
-eval {
-  process();
-};
+eval { process(); };
 
-if ( $@ ) {
-    print STDERR $@;
+if ($@) {
+  print STDERR $@;
 
-    use HTML::Escape qw/escape_html/;
+  use HTML::Escape qw/escape_html/;
 
-    print "Status: 500 Internal Error\r\n";
-    print "Content-type: text/html\r\n";
-    print "\r\n";
-    my $error = escape_html($@);
-    print <<HTML;
+  print "Status: 500 Internal Error\r\n";
+  print "Content-type: text/html\r\n";
+  print "\r\n";
+  my $error = escape_html($@);
+  print <<HTML;
 <html>
 <head>
-<title>Error </title>
+<title>Error in $0</title>
 </head>
 <body>
 <pre>$error</pre>
