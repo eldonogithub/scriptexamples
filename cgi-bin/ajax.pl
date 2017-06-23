@@ -3,17 +3,17 @@
 use strict;
 use warnings FATAL => "all";
 
-use local::lib('/home/eldon.olmstead/examples/cgi-bin/perl5');
+use local::lib('/home/eldon/scriptexamples/cgi-bin/perl5');
+
 use Template;
 use JSON;
 
 use CGI;
 
+# create reference to CGI module N.B., this module is deprecated for a while now
+my $cgi = CGI->new();
+
 sub process {
-
-  # create reference to CGI module N.B., this module is deprecated for a while now
-  my $cgi = CGI->new();
-
   # Create Template Toolkit reference.
   my $tt = Template->new(
     'STRICT' => 1,
@@ -127,35 +127,37 @@ sub process {
 
   my $content = $dbobj->pretty(1)->encode($db);
 
-  my $content_length = length($content);
 
-  print "Status: 200 Ok\r\n";
-  print "Content-Length: $content_length\r\n";
-  print "Content-type: application/json\r\n";
-  print "\r\n";
-
-  print $content;
+  return $content;
 }
 
-eval { process(); };
+my $content;
+eval { $content = process(); };
 
 if ($@) {
-  print STDERR $@;
+  open(my $fh, ">", "/home/eldon/scriptexamples/logs/perl.log") || die "Unable to open file: $!";
+  print $fh $@;
+  close($fh);
 
   use HTML::Escape qw/escape_html/;
 
-  print "Status: 500 Internal Error\r\n";
-  print "Content-type: text/html\r\n";
-  print "\r\n";
   my $error = escape_html($@);
-  print <<HTML;
-<html>
-<head>
-<title>Error in $0</title>
-</head>
-<body>
-<pre>$error</pre>
-</body>
-</html>
-HTML
+  my $json = {
+    "draw" => '"' . int( $cgi->param("draw") ) . '"',
+    "data" => [],
+    "recordsFiltered" => 0,
+    "status" => "Failed",
+    "error" => $error,
+  };
+
+  my $dbobj = new JSON;
+  $content = $dbobj->pretty(1)->encode($json);
 }
+my $content_length = length($content);
+
+print "Status: 200 Ok\r\n";
+print "Content-Length: $content_length\r\n";
+print "Content-type: application/json\r\n";
+print "\r\n";
+
+print $content;
