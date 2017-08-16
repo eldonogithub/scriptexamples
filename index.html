@@ -11,92 +11,110 @@
 <script src="//code.jquery.com/jquery-1.12.4.js"></script>
 <script src="//cdn.datatables.net/1.10.15/js/jquery.dataTables.min.js"></script>
 <script>
-  // Handler for displaying the creationDate in human readable form
-  function creationDateRenderer(data, type, row, meta) {
-    if (type == "display") {
-      var d = new Date(data * 1000);
-      return d.toISOString();
-    }
-    // otherwise just return the numeric data
-    return data;
-  }
-
-  function imsiRenderer(data, type, row, meta) {
-    if ( type == "display" ) {
-      return "<a href=\"?imsi=" + encodeURIComponent(data) + "\">" + encodeURI(data) + "</a>";
-    }
-    return data;
-  }
-
-  function msisdnRenderer(data, type, row, meta) {
-    if ( type == "display" ) {
-      return "<a href=\"?msisdn=" + encodeURIComponent(data) + "\">" + encodeURI(data) + "</a>";
-    }
-    return data;
-  }
   // When the DOM is ready  start 
-  $(document).ready(function() {
+  $(document).ready(
+      function() {
 
-    // Handle the row click
-    function rowClickHandler() {
-      // Ask DataTables which data row this is
-      var data = dt.row(this).data();
-
-      alert('You clicked the row for MSISDN=' + data.msisdn);
-    }
-
-    function ajaxHandler(data, cb, settings) {
-      function successHandler(data) {
-        if (data.status === 'Success') {
-          cb(data);
-        } else {
-          // error
+        // Crazy stupid way of doing HTML encoding for javascript. But it works 
+        // because it is using innerHtml and textContent from the DOM API. 
+        function encode(txt) {
+          var t2h = $("<div/>");
+          return t2h.text(txt).html();
         }
-      }
-      // send ajax call
-      $.ajax();
-    }
 
-    // Prepare the data table rendering
-    var dt = $('#example').DataTable({
-      ajax : {
-        "url" : "/cgi-bin/ajax.pl",
-        "method" : "POST"
-      },
-      serverSide : true,
-      pageLength : 10,
-      lengthMenu : [ 1, 5, 10, 50, 100, 1000 ],
-      regex : true,
-      info : false,
-      ordering : false,
-      pagingType : "simple",
-      columns : [ {
-        "title" : "Row",
-        "data" : "row"
-      }, {
-        "title" : "AOR",
-        "data" : "aor",
-      }, {
-        "title" : "IMSI",
-        "data" : "imsi",
-        render : imsiRenderer
-      }, {
-        "title" : "MSISDN",
-        "data" : "msisdn",
-        render : msisdnRenderer
-      }, {
-        "title" : "Operator ID",
-        "data" : "operatorId",
-      }, {
-        "title" : "Creation Date",
-        "data" : "creationDate",
-        render : creationDateRenderer
-      }, ]
-    });
+        // Handler for displaying the creationDate in human readable form
+        function creationDateRenderer(data, type, row, meta) {
+          if (type == "display") {
+            var d = new Date(data * 1000);
+            return d.toISOString();
+          }
+          // otherwise just return the numeric data
+          return data;
+        }
 
-    // Use jQuery's delegated API to apply click handling
-    // dt.on('click', 'tr', rowClickHandler);
-  });
+        function imsiRenderer(data, type, row, meta) {
+          if (type == "display") {
+            return "<a href=\"#imsi=" + encodeURIComponent(data) + "\">"
+                + encode(data) + "</a>";
+          }
+          return data;
+        }
+
+        function msisdnRenderer(data, type, row, meta) {
+          if (type == "display") {
+            return "<a href=\"#msisdn=" + encodeURIComponent(data) + "\">"
+                + encode(data) + "</a>";
+          }
+          return data;
+        }
+        // Handle the row click
+        function rowClickHandler() {
+          // Ask DataTables which data row this is
+          var data = dt.row(this).data();
+
+          alert('You clicked the row for MSISDN=' + data.msisdn);
+        }
+
+        function ajaxHandler(data, cb, settings) {
+          function successHandler(data) {
+            if (data.status === 'Success') {
+              cb(data);
+            } else {
+              // error
+            }
+          }
+          // send ajax call
+          $.ajax();
+        }
+        var options = {
+          ajax : {
+            "url" : "/cgi-bin/ajax.pl",
+            "method" : "POST"
+          },
+          serverSide : true,
+          pageLength : 10,
+          lengthMenu : [ 1, 5, 10, 50, 100, 1000 ],
+          regex : true,
+          info : false,
+          ordering : false,
+          pagingType : "simple",
+          columns : [ {
+            "title" : "Row",
+            "data" : "row"
+          }, {
+            "title" : "AOR",
+            "data" : "aor",
+          }, {
+            "title" : "IMSI",
+            "data" : "imsi",
+            render : imsiRenderer
+          }, {
+            "title" : "MSISDN",
+            "data" : "msisdn",
+            render : msisdnRenderer
+          }, {
+            "title" : "Operator ID",
+            "data" : "operatorId",
+          }, {
+            "title" : "Creation Date",
+            "data" : "creationDate",
+            render : creationDateRenderer
+          }, ]
+        };
+
+        var urlParams = new URLSearchParams(window.location.hash);
+        if ( urlParams.get("msisdn") !== null ) {
+          options["search"] = { 
+              "search" : urlParams.get("msisdn")
+          };
+        }
+        
+        // Prepare the data table rendering
+        var dt = $('#example').DataTable(options);
+
+        // Use jQuery's delegated API to apply click handling
+        // dt.on('click', 'tr', rowClickHandler);
+      });
 </script>
 </head>
 <body>

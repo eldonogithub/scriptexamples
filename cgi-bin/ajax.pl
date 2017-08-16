@@ -3,7 +3,7 @@
 use strict;
 use warnings FATAL => "all";
 
-use local::lib('/home/eldon/scriptexamples/cgi-bin/perl5');
+use local::lib('/home/eldon.olmstead/examples/cgi-bin/perl5');
 
 use Template;
 use JSON;
@@ -25,6 +25,7 @@ sub process {
   my @tns;
   my $max = 1026;
 
+  # generate a large number of rows
   for ( my $i = 0 ; $i < $max - 3 ; $i++ ) {
 
     my $pn = "1613456" . sprintf( "%.4d", $i );
@@ -40,6 +41,7 @@ sub process {
     push( @tns, $row );
   }
 
+  # some canned data
   my $data = [
     {
       "row"          => 1,
@@ -67,16 +69,20 @@ sub process {
     }
   ];
 
+  # append all the data together
   push( @$data, @tns );
 
   my $total = @$data;
 
+  # object to pass back as JSON
   my $db = {
     "draw" => '"' . int( $cgi->param("draw") ) . '"',
 
     #  "recordsTotal" => $total,
     "status" => "Success"
   };
+  
+  # get search string
   my $search = $cgi->param('search[value]');
   if ( defined($search) ) {
     print STDERR "Filtering imsi by: $search\n";
@@ -88,6 +94,7 @@ sub process {
 
   my @filtered;
   if ( defined($search) && $search ne "" ) {
+    $search = quotemeta($search);
     @filtered = ( grep { $_->{imsi} =~ /^$search/ } @$data );
   }
   else {
@@ -135,10 +142,6 @@ my $content;
 eval { $content = process(); };
 
 if ($@) {
-  open(my $fh, ">", "/home/eldon/scriptexamples/logs/perl.log") || die "Unable to open file: $!";
-  print $fh $@;
-  close($fh);
-
   use HTML::Escape qw/escape_html/;
 
   my $error = escape_html($@);
