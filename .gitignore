@@ -3,3 +3,6 @@ java
 unpv13e
 *.o
 *.bak
+cgi-bin/perl5/
+a.out
+perl5
