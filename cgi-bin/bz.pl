@@ -155,7 +155,7 @@ sub main {
     $log->debug("Current Hour: $current_hour\n") if ($trace);
     my $prev_time = $current_hour->clone();
 
-    # TODO remove quirk
+    # TODO remove quirk -- in the case of weekly report, also start from 8am only
     if ($weekly) {
       # query for all changes since the beginning of last week
       $current_hour->set_hour( 8 );
@@ -193,6 +193,7 @@ sub main {
 
     $log->debug("Start time: " . $bzLastChangeTime . "\n") if ($trace);
 
+    # Find all tickets that are assigned to my team
     my $assigned = BZ::Client::Bug->search(
       $client,
       {
@@ -219,6 +220,7 @@ sub main {
       }
     );
 
+    # Find all tickets that my team created/reported
     my $reported = BZ::Client::Bug->search(
       $client,
       {
@@ -264,6 +266,8 @@ sub main {
     my $content;
     my $subject;
 
+    # If there are no bugs from the above queries, there isn't much point in refining further
+    # so just report that nothing changed
     if ( @bugs == 0 ) {
       $subject = "Bugzilla Team - No Changes Since $bzLastChangeTime";
       $content = <<'HTML';
@@ -283,6 +287,8 @@ sub main {
 HTML
     }
     else {
+
+      # Further refine the queries above by looking at the history of each ticket
       my $total_tickets = 0;
       foreach my $entry ( sort sort_by_milestone @bugs ) {
 
@@ -290,10 +296,14 @@ HTML
 	$log->debug("$id Process ticket \n") if ($trace);
 
 	# grab first element of the returned list
+	# Get the history of the ticket
 	my ($history) = $entry->history( $client, { ids => [ $entry->id() ] } );
+
+        # Get the comments for the ticket
 	my $comments =
 	  BZ::Client::Bug::Comment->get( $client, { ids => [ $entry->id() ] } );
 
+        # Create the URI to the ticket for later use
 	my $uri =
 	  URI->new(
 	  'https://bugzilla.newpace.ca/show_bug.cgi?id=' . $entry->id() );
@@ -313,6 +323,8 @@ HTML
 	my $status_html   = HTML::Escape::escape_html($status);
 
 	my $ticket_comments = 0;
+
+        # Get the bug id?
 	my ($bug) = keys %{ $comments->{'bugs'} };
 
 	my @comment_links;
@@ -322,6 +334,9 @@ HTML
 	for my $comment ( @{ $comments->{'bugs'}->{$bug} } ) {
 	  $cid++;
 	  my $when = $comment->{'time'};
+
+          # If the comment was further in the past than the query data range,
+          # ignore it.
 	  if ( DateTime->compare( $when, $prev_time ) >= 0 ) {
 	    $log->debug("$id commentId=$cid\n") if ($trace);
 	    $ticket_comments++;
@@ -348,6 +363,8 @@ HTML
 	for my $update ( @{ $history->{"history"} } ) {
 	  my $when = $update->{'when'};
 
+          # If the comment was further in the past than the query data range,
+          # ignore it.
 	  if ( DateTime->compare( $when, $prev_time ) >= 0 ) {
 	    $ticket_changes++;
 	    for my $change ( @{ $update->{'changes'} } ) {

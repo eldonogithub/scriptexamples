@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include <chrono>
+#include <chrono> 	// requires c++11
 #include <sstream>
 
 int main ()

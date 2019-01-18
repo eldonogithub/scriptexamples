@@ -1,4 +1,5 @@
 #include <string>
+#include <iostream>
 
 class Alpha {
 
@@ -14,4 +15,5 @@ int main() {
 
   Alpha *ptr = 0;
   value = ptr->getText().empty();
+  std::cout << "Value: " << value << std::endl;
 }

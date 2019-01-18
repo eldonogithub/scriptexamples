@@ -84,7 +84,7 @@ void handle_io_on_socket(struct epoll_event event)
     std::cout << "Handle io on FD ( " << event.data.fd << " )" << std::endl;
     char buf[2];
 
-    size_t count = read (event.data.fd, buf, sizeof( buf ) -1  );
+    ssize_t count = read (event.data.fd, buf, sizeof( buf ) -1  );
     buf[count] = 0;
     if (count == -1) {
         /* If errno == EAGAIN, that means we have read all
@@ -130,6 +130,10 @@ int main(int argc, char *argv[])
     ev.data.fd = client_sock;
 
     int res = epoll_ctl(efd, EPOLL_CTL_ADD, client_sock, &ev);
+    if ( res == -1 ) {
+      std::cerr << "Error epoll_ctl(): " << strerror(errno) << std::endl;
+      return 1;
+    }
 
     /* Buffer where events are returned */
     events = (epoll_event*) calloc (MAX_EPOLL_EVENTS_PER_RUN, sizeof(ev) );
