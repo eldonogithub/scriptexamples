@@ -4,5 +4,6 @@ unpv13e
 *.o
 *.bak
 cgi-bin/perl5/
+cgi-bin/local-lib-2.000024/
 a.out
 perl5
