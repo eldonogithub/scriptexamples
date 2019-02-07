@@ -269,7 +269,7 @@ sub main {
     # If there are no bugs from the above queries, there isn't much point in refining further
     # so just report that nothing changed
     if ( @bugs == 0 ) {
-      $subject = "Bugzilla Team - No Changes Since $bzLastChangeTime";
+      $subject = "RCS-Infra - No Changes Since $bzLastChangeTime";
       $content = <<'HTML';
   <html>
     <head>
@@ -403,7 +403,7 @@ ROW
       # was all tickets filtered out?
       if ( $total_tickets == 0 ) {
 	$log->debug("All tickets filtered\n") if ($trace);
-	$subject = "Bugzilla Team - No Changes Since $bzLastChangeTime";
+	$subject = "RCS-Infra - No Changes Since $bzLastChangeTime";
 	$content = <<'HTML';
   <html>
     <head>
@@ -423,7 +423,7 @@ HTML
       else {
 	$log->debug("Total tickets = $total_tickets\n") if ($trace);
 	$subject =
-	  "Bugzilla Team - ($total_tickets) Changes Since $bzLastChangeTime";
+	  "RCS-Infra - ($total_tickets) Changes Since $bzLastChangeTime";
 	$content = <<"HTML";
   <html>
     <head>

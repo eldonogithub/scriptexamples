@@ -1,0 +1,771 @@
+
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>Customer Service Portal</title>
+<link rel="stylesheet" type="text/css" href="style.css"></link>
+<link rel="stylesheet" type="text/css" href="datatables.css"></link>
+<script src="jquery-1.11.0.min.js"></script>
+<script type="text/javascript" charset="utf8" src="datatables.js"></script>
+<script src="customerPortal.js"></script>
+<script src="validation.js"></script>
+<script src="tableSort.js"></script>
+</head>
+<body>
+
+	<!--Custom dialog box used to convey information-->
+	<div id="alertBox" class="hiddenForm">
+			<h3 id="alertBoxHeader"></h3>
+		<div class="overlayFormBody">
+			<div id="alertBoxMessage"></div>
+		</div>
+		<div class="overlayFormFooter">
+			<button class="closeOverlay">Close</button>
+		</div>
+	</div>
+	<div id="createAccountFormContainer" class="largeHiddenForm">
+		<!--The Create Account Form -->
+		<div class="overlayFormHeader">
+			<h3>Create New Account</h3>
+		</div>
+		<form name="input" id="createAccountForm" action="createAccount"
+			method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<label class="formLabel" for="newAccountServerName">Cluster
+						Name</label> <span class="required">*</span> <select
+						id="newAccountServerName" name="serverName"
+						class="createAccountFormInput">
+						<option value="None">None</option>
+					</select>
+				</div>
+				<div class="formGrouping">
+					<label class="formLabel" for="newAccountMsisdn">MSISDN</label> <span
+						class="required">*</span> <input id="newAccountMsisdn" type="text"
+						name="msisdn" class="createAccountFormInput">
+				</div>
+				<div class="formGrouping">
+					<label class="formLabel" for="newAccountImsi">IMSI</label> <span
+						class="required">*</span> <input id="newAccountImsi" type="text"
+						name="imsi" class="createAccountFormInput">
+				</div>
+				<div class="formGrouping">
+					<label class="formLabel" for="newAccountDomain">Domain</label> <span
+						class="required">*</span> <input id="newAccountDomain" type="text"
+						name="domain" class="createAccountFormInput">
+				</div>
+				<div class="formGrouping">
+					<label class="formLabel" for="newAccountPublicId">Public
+						Identity</label> <span class="required">*</span> <input
+						id="newAccountPublicId" type="text" name="publicIdentity"
+						class="createAccountFormInput">
+				</div>
+				<div class="formGrouping">
+					<label class="formLabel" for="newAccountPassword">Password</label>
+					<span class="required">*</span> <input id="newAccountPassword"
+						type="text" name="password" class="createAccountFormInput">
+				</div>
+				<div class="formGrouping">
+					<label class="formLabel" for="newAccountBillingType">Billing
+						Type</label> <span class="required">*</span> <select
+						id="newAccountBillingType" name="billingType"
+						class="createAccountFormInput">
+						<option value="None">None</option>
+						<option value="PrePaid">PrePaid</option>
+						<option value="PostPaid">PostPaid</option>
+					</select>
+				</div>
+				<div class="formGrouping">
+					<label class="formLabel">Billing Flags</label><br />
+					<div id="billingFlagsContainer">
+						<input type="checkbox" name="bfRegister" value="Register">
+						<label class="billingFlagsBoxLabel"> Register</label><br /> <input
+							type="checkbox" name="bfReceiveInstantMessage"
+							value="ReceiveInstantMessage"> <label
+							class="billingFlagsBoxLabel"> Receive Instant Message</label><br />
+						<input type="checkbox" name="bfSendInstantMessage"
+							value="SendInstantMessage"> <label
+							class="billingFlagsBoxLabel"> Send Instant Message</label><br />
+						<input type="checkbox" name="bfReceiveFileTransfer"
+							value="ReceiveFileTransfer"> <label
+							class="billingFlagsBoxLabel"> Receive File Transfer</label><br />
+						<input type="checkbox" name="bfSendFileTransfer"
+							value="SendFileTransfer"> <label
+							class="billingFlagsBoxLabel"> Send File Transfer</label><br /> <input
+							type="checkbox" name="bfReceiveVideoShare"
+							value="ReceiveVideoShare"> <label
+							class="billingFlagsBoxLabel"> Receive Video Share</label><br />
+						<input type="checkbox" name="bfSendVideoShare"
+							value="SendVideoShare"> <label
+							class="billingFlagsBoxLabel"> Send Video Share</label><br /> <input
+							type="checkbox" name="bfReceiveImageShare"
+							value="ReceiveImageShare"> <label
+							class="billingFlagsBoxLabel"> Receive Image Share</label><br />
+						<input type="checkbox" name="bfSendImageShare"
+							value="SendImageShare"> <label
+							class="billingFlagsBoxLabel"> Send Image Share</label><br /> <input
+							type="checkbox" name="bfSendAudio" value="SendAudio"> <label
+							class="billingFlagsBoxLabel"> Send Audio</label><br /> <input
+							type="checkbox" name="bfReceiveAudio" value="ReceiveAudio">
+						<label class="billingFlagsBoxLabel"> Receive Audio</label><br />
+						<input type="checkbox" name="bfSendAudioVideo"
+							value="SendAudioVideo"> <label
+							class="billingFlagsBoxLabel"> Send Audio Video</label><br /> <input
+							type="checkbox" name="bfReceiveAudioVideo"
+							value="ReceiveAudioVideo"> <label
+							class="billingFlagsBoxLabel"> Receive Audio Video</label><br />
+						<!-- <input type="hidden" name="bfNone" value="None">-->
+					</div>
+				</div>
+
+				<div class="formGrouping">
+					<label class="formLabel" for="newAccountBillingId">Billing
+						Id</label> <span class="required">*</span> <input id="newAccountBillingId"
+						type="text" name="billingIdentity" class="createAccountFormInput">
+				</div>
+				<div class="formGrouping">
+					<label class="formLabel" for="newAccountConfigId">Configuration&nbsp;Name<span
+						class="required">*</span></label> <select id="newAccountConfigId"
+						type="text" name="configurationId" class="createAccountFormInput">
+						<option value="None">None</option>
+					</select>
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					type="hidden" name="action" value="Add"> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitCreateAccount" type="submit" value="Submit"> <span
+					id="createAccountErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+
+
+	<!--NEW-->
+
+	<div id="setPasswordFormContainer" class="hiddenForm">
+		<!--The Set Password Form -->
+		<div class="overlayFormHeader">
+			<h3>Set Password</h3>
+		</div>
+		<form id="setPasswordForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<label class="formLabel" for="setPasswordFormValue">New
+						Password</label> <span class="required">*</span> <input type="hidden"
+						name="msisdn" value=""> <input id="setPasswordFormValue"
+						type="text" name="password"><br />
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSetPasswordForm" type="submit" value="Submit"> <span
+					id="setPasswordErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+
+	<div id="resendOtpFormContainer" class="hiddenForm">
+		<!--The Resend Otp Form -->
+		<div class="overlayFormHeader">
+			<h3>Resend OTP</h3>
+		</div>
+		<form id="resendOtpForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<input type="hidden" name="msisdn" value=""> <label
+						class="formLabel" for="resendOtpFormValue">OTP:</label> <select
+						id="selectResendOtp">
+					</select>
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input class="closeOverlay" type="reset" value="Cancel"> <input
+					id="ResendOtpForm" type="submit" value="Submit"> <span
+					id="resendOtpErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+
+	<div id="deleteOtpFormContainer" class="hiddenForm">
+		<!--The Delete Otp Form -->
+		<div class="overlayFormHeader">
+			<h3>Delete OTP</h3>
+		</div>
+		<form id="deleteOtpForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<input type="hidden" name="msisdn" value=""> <label
+						class="formLabel" for="deleteOtpFormValue">OTP:</label> <select
+						id="selectDeleteOtp">
+					</select>
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitDeleteOtpForm" type="submit" value="Submit"> <span
+					id="deleteOtpErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+  
+ 
+
+
+	<div id="setConfigurationFormContainer" class="hiddenForm">
+		<!--The Set Configuration Form -->
+		<div class="overlayFormHeader">
+			<h2>Set Configuration</h2>
+		</div>
+		<form id="setConfigurationForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<input type="hidden" name="msisdn" value=""> <label
+						id="setConfigurationFormConfigurationTypeLabel" class="formLabel"
+						for="setConfigurationFormConfigurationType">New&nbsp;Configuration&nbsp;Type<span
+						class="required">*</span></label> <select
+						id="setConfigurationFormConfigurationType"
+						class="setConfigurationFormInputs" name="configurationType">
+						<option value="Normal">Normal</option>
+						<option value="Reboot">Reboot</option>
+						<option value="Disabled">Disabled</option>
+						<option value="UserActionRequired">User Action Required</option>
+						<option value="Dormant">Dormant</option>
+					</select></br> <label class="formLabel" for="setConfigurationFormConfigurationID">New&nbsp;Configuration&nbsp;Name<span
+						class="required">*</span></label> <select
+						id="setConfigurationFormConfigurationID"
+						class="setConfigurationFormInputs" name="configurationID">
+						<option value="None">None</option>
+					</select></br>
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSetConfigurationForm" type="submit" value="Submit">
+				<span id="setConfigurationErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+	<div id="setConfigurationTypeDisabled" class="hiddenForm">
+		<!--The Set Configuration Form -->
+		<div class="overlayFormHeader">
+			<h2>Warning</h2>
+		</div>
+		<p class="configError">Are you sure you want to disable this
+			account ?</p>
+		<div class="overlayFormFooter">
+			<input class="closeOverlayDisabled" type="reset" value="No">
+			<input id="submitSetConfigurationTypeDisabledForm" type="submit"
+				value="Yes">
+		</div>
+	</div>
+	
+    <div id="setConfigurationIdFormContainer" class="hiddenForm">
+		<!--The Set Configuration Id Form -->
+		<div class="overlayFormHeader">
+			<h2>Set Configuration Id</h2>
+		</div>
+		<form id="setConfigurationIdForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<input type="hidden" name="msisdn" value=""><label class="formLabelConfigId" 
+					for="setConfigurationIdForm">Configuration Id <span
+						class="required">*</span></label> <select
+						id="setConfigurationId"  name="configurationID"> 
+					</select></br>
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSetConfigurationIdForm" type="submit" value="Submit">
+				<span id="setConfigurationIdErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+	
+	
+    <div id="setRcsStateFormContainer" class="hiddenForm">
+		<!--The Set Rcs state Form -->
+		<div class="overlayFormHeader">
+			<h2>Set RCS State</h2>
+		</div>
+		<form id="setRcsStateForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<input type="hidden" name="msisdn" value=""> <label  class="formLabel"
+						for="setRcsStateFormConfigurationType">Rcs State<span
+						class="required">*</span></label> <select
+						id="setRcsStateValues"
+						class="setRcsStateInputs" name="configurationType">
+					</select></br>  
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSetRcsStateForm" type="submit" value="Submit">
+				<span id="setRcsStateErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+	
+	<div id="setImsVersionFormContainer" class="hiddenForm">
+		<!--The Set Ims Version Form -->
+		<div class="overlayFormHeader">
+			<h2>Set IMS State</h2>
+		</div>
+		<form id="setImsVersionForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<input type="hidden" name="msisdn" value=""> <label  class="formLabel"
+						for="setImsVersionFormConfigurationType">IMS State<span
+						class="required">*</span></label> <select
+						id="setImsVersionValues"
+						class="setImsVersionInputs" name="configurationVersion"> 
+					</select></br>  
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSetImsVersionForm" type="submit" value="Submit">
+				<span id="setImsVersionErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+	
+	<!-- Send  SMS and update configuration type form -->
+	<div id="sendSmsFormContainer" class="hiddenForm">
+		<!--The Set Configuration Form -->
+		<div class="overlayFormHeader">
+			<h2>Send NRCR SMS</h2>
+		</div>
+		<form id="sendSmsForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<input type="hidden" name="msisdn" value=""> <input
+						type="hidden" name="imsi" value=""> <input type="hidden"
+						name="domain" value=""> <input type="hidden"
+						name="publicIdentity" value=""> <label
+						id="sendSmsFormConfigurationTypeLabel" class="formLabel"
+						for="sendSmsFormConfigurationType">New&nbsp;Configuration&nbsp;Type<span
+						class="required">*</span></label> <select
+						id="sendSmsFormConfigurationType" class="sendSmsFormInputs"
+						name="configurationType">
+						<option value="Normal">Normal</option>
+						<option value="Reboot">Reboot</option>
+						<option value="Disabled">Disabled</option>
+						<option value="UserActionRequired">User Action Required</option>
+						<option value="Dormant">Dormant</option>
+					</select></br> <label class="formLabel" for="sendSmsFormConfigurationID">New&nbsp;Configuration&nbsp;Name<span
+						class="required">*</span></label> <select id="sendSmsFormConfigurationID"
+						class="sendSmsFormInputs" name="configurationID">
+						<option value="None">None</option>
+					</select></br>
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSendSmsForm" type="submit" value="Submit"> <span
+					id="sendSmsErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+
+	<div id="setRoutingPolicyIDFormContainer" class="hiddenForm">
+		<!--The Set Routing Policy ID Form -->
+		<div class="overlayFormHeader">
+			<h3>Set Routing Policy ID</h3>
+		</div>
+		<form id="setRoutingPolicyIDForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<label class="formLabel" for="setRoutingPolicyIDFormValue">New
+						Routing Policy ID</label> <span class="required">*</span> <input
+						type="hidden" name="msisdn" value=""> <input
+						id="setRoutingPolicyIDText" type="text" name="routePolicyID"><br />
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSetRoutingPolicyIDForm" type="submit" value="Submit">
+				<span id="setRoutingPolicyIDErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+
+	<div id="setTosFormContainer" class="hiddenForm">
+		<!--The TOS Form -->
+		<div class="overlayFormHeader">
+			<h3>Set Terms of Service</h3>
+		</div>
+		<form id="setTosForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<label class="formLabel">TOS Options</label> <span class="required">*</span>
+					<input type="hidden" name="msisdn" value=""> <input
+						id="tosFormAccept" type="radio" name="termsOfService" value="true">Accept
+					<input id="tosFormDecline" type="radio" name="termsOfService"
+						value="false">Decline
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSetTosForm" type="submit" value="Submit">
+			</div>
+		</form>
+	</div>
+
+	<div id="setBillingFormContainer" class="largeHiddenForm">
+		<!--The Billing Form -->
+		<div class="overlayFormHeader">
+			<h3>Set Billing</h3>
+		</div>
+		<form id="setBillingForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<input type="hidden" name="msisdn" value=""> <label
+						class="formLabel" for="accountBillingType">Billing Type</label> <span
+						class="required">*</span> <select id="accountBillingType"
+						name="billingType">
+						<option value="None">None</option>
+						<option value="PrePaid">PrePaid</option>
+						<option value="PostPaid">PostPaid</option>
+					</select>
+				</div>
+				<div class="formGrouping">
+					<label class="formLabel" for="accountBillingId">Billing Id</label>
+					<span class="required">*</span> <input id="accountBillingId"
+						type="text" name="billingIdentity" value="" disabled>
+				</div>
+				<div class="formGrouping">
+					<label class="formLabel">Billing Flags</label><br />
+					<div id="accountBillingFlagsContainer">
+						<input type="checkbox" id="abfRegister" name="bfRegister"
+							value="Register" disabled> <label
+							class="billingFlagsBoxLabel"> Register</label><br /> <input
+							type="checkbox" id="abfReceiveInstantMessage"
+							name="bfReceiveInstantMessage" value="ReceiveInstantMessage"
+							disabled> <label class="billingFlagsBoxLabel">
+							Receive Instant Message</label><br /> <input type="checkbox"
+							id="abfSendInstantMessage" name="bfSendInstantMessage"
+							value="SendInstantMessage" disabled> <label
+							class="billingFlagsBoxLabel"> Send Instant Message</label><br />
+						<input type="checkbox" id="abfReceiveFileTransfer"
+							name="bfReceiveFileTransfer" value="ReceiveFileTransfer" disabled>
+						<label class="billingFlagsBoxLabel"> Receive File Transfer</label><br />
+						<label class="billingFlagsBoxLabel"> Send File Transfer</label><br />
+						<input type="checkbox" id="abfReceiveVideoShare"
+							name="bfReceiveVideoShare" value="ReceiveVideoShare" disabled>
+						<label class="billingFlagsBoxLabel"> Receive Video Share</label><br />
+						<input type="checkbox" id="abfSendVideoShare"
+							name="bfSendVideoShare" value="SendVideoShare" disabled>
+						<label class="billingFlagsBoxLabel"> Send Video Share</label><br />
+						<input type="checkbox" id="abfReceiveImageShare"
+							name="bfReceiveImageShare" value="ReceiveImageShare" disabled>
+						<label class="billingFlagsBoxLabel"> Receive Image Share</label><br />
+						<input type="checkbox" id="abfSendImageShare"
+							name="bfSendImageShare" value="SendImageShare" disabled>
+						<label class="billingFlagsBoxLabel"> Send Image Share</label><br />
+						<input type="checkbox" id="abfSendAudio" name="bfSendAudio"
+							value="SendAudio" disabled> <label
+							class="billingFlagsBoxLabel"> Send Audio</label><br /> <input
+							type="checkbox" id="abfReceiveAudio" name="bfReceiveAudio"
+							value="ReceiveAudio" disabled> <label
+							class="billingFlagsBoxLabel"> Receive Audio</label><br /> <input
+							type="checkbox" id="abfSendAudioVideo" name="bfSendAudioVideo"
+							value="SendAudioVideo" disabled> <label
+							class="billingFlagsBoxLabel"> Send Audio Video</label><br /> <input
+							type="checkbox" id="abfReceiveAudioVideo"
+							name="bfReceiveAudioVideo" value="ReceiveAudioVideo" disabled>
+						<label class="billingFlagsBoxLabel"> Receive Audio Video</label><br />
+					</div>
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSetBillingForm" type="submit" value="Submit">
+			</div>
+		</form>
+	</div>
+
+
+	<div id="setFeaturesFormContainer" class="largeHiddenForm">
+		<!--The Features Form -->
+		<div class="overlayFormHeader">
+			<h3>Set Features</h3>
+		</div>
+		<form id="setFeaturesForm" name="input" method="post">
+			<div class="overlayFormBody">
+
+				<div class="formGrouping">
+					<label class="formLabel">Features Flags</label><br />
+					<div id="accountFeaturesFlagsContainer">
+
+						<input type="hidden" name="featuresMsisdn" id="featuresMsisdnID"
+							value=""> <input type="checkbox" id="affSend1to1Chat"
+							name="ffSend1to1Chat" value="Send1to1Chat"> <label
+							class="featuresFlagsBoxLabel"> Send 1-to-1 Chat</label><br /> <input
+							type="checkbox" id="affReceive1to1Chat" name="ffReceive1to1Chat"
+							value="Receive1to1Chat"> <label
+							class="featuresFlagsBoxLabel"> Receive 1-to-1 Chat</label><br />
+
+						  <input type="checkbox"
+							id="affSend1to1ChatBreakoutToSMS"
+							name="ffSend1to1ChatBreakoutToSMS"
+							value="Send1to1ChatBreakoutToSMS"> <label
+							class="featuresFlagsBoxLabel"> Send 1-to-1 Chat Breakout
+							To SMS</label><br /> <input type="checkbox"
+							id="affReceive1to1ChatBreakinWhenOfflineFromSMS"
+							name="ffReceive1to1ChatBreakinWhenOfflineFromSMS"
+							value="Receive1to1ChatBreakinWhenOfflineFromSMS"> <label
+							class="featuresFlagsBoxLabel"> Receive 1-to-1 Chat
+							Breakin When Offline From SMS</label><br /> <input type="checkbox"
+							id="affSendGroupChat" name="ffSendGroupChat"
+							value="SendGroupChat"> <label
+							class="featuresFlagsBoxLabel"> Send Group Chat</label><br /> <input
+							type="checkbox" id="affReceiveGroupChat"
+							name="ffReceiveGroupChat" value="ReceiveGroupChat"> <label
+							class="featuresFlagsBoxLabel"> Receive Group Chat</label><br />
+						 <input type="checkbox" id="affSendFileTransfer"
+							name="ffSendFileTransfer" value="SendFileTransfer"> <label
+							class="featuresFlagsBoxLabel"> Send File Transfer</label><br />
+						<input type="checkbox" id="affReceiveFileTransfer"
+							name="ffReceiveFileTransfer" value="ReceiveFileTransfer">
+						<label class="featuresFlagsBoxLabel"> Receive File
+							Transfer</label><br />  <input type="checkbox"
+							id="affSendFileTransferBreakoutToMMS"
+							name="ffSendFileTransferBreakoutToMMS"
+							value="SendFileTransferBreakoutToMMS"> <label
+							class="featuresFlagsBoxLabel"> Send File Transfer
+							Breakout To MMS</label><br /> <input type="checkbox"
+							id="affSendVideoShare" name="ffSendVideoShare"
+							value="SendVideoShare"> <label
+							class="featuresFlagsBoxLabel"> Send Video Share </label><br /> <input
+							type="checkbox" id="affReceiveVideoShare"
+							name="ffReceiveVideoShare" value="ReceiveVideoShare"> <label
+							class="featuresFlagsBoxLabel"> Receive Video Share </label><br />
+
+						<input type="checkbox" id="affSendVoipCall" name="ffSendVoipCall"
+							value="SendVoipCall"> <label
+							class="featuresFlagsBoxLabel"> Send Voip Call </label><br /> <input
+							type="checkbox" id="affReceiveVoipCall" name="ffReceiveVoipCall"
+							value="ReceiveVoipCall"> <label
+							class="featuresFlagsBoxLabel"> Receive Voip Call </label><br />
+						<input type="checkbox" id="affSendVoipBreakoutToPSTN"
+							name="ffSendVoipBreakoutToPSTN" value="SendVoipBreakoutToPSTN">
+						<label class="featuresFlagsBoxLabel"> Send Voip Breakout
+							To PSTN</label><br /> <input type="checkbox"
+							id="affReceiveVoipBreakinPSTN" name="ffReceiveVoipBreakinPSTN"
+							value="ReceiveVoipBreakinPSTN"> <label
+							class="featuresFlagsBoxLabel"> Receive Voip Breakin PSTN</label><br />
+
+						<input type="checkbox" id="affSendVideoCall"
+							name="ffSendVideoCall" value="SendVideoCall"> <label
+							class="featuresFlagsBoxLabel"> Send Video Call</label><br /> <input
+							type="checkbox" id="affReceiveVideoCall"
+							name="ffReceiveVideoCall" value="ReceiveVideoCall"> <label
+							class="featuresFlagsBoxLabel"> Receive Video Call</label><br />
+						<input type="checkbox" id="affMessageStore" name="ffMessageStore"
+							value="MessageStore"> <label
+							class="featuresFlagsBoxLabel"> Message Store</label><br /> <input
+							type="checkbox" id="affReceiveSMSBreakinPSTN"
+							name="ffReceiveSMSBreakinPSTN" value="ReceiveSMSBreakinPSTN">
+						<label class="featuresFlagsBoxLabel"> Receive SMS Breakin
+							PSTN</label><br /> <input type="checkbox" id="affPresence"
+							name="ffPresence" value="Presence"> <label
+							class="featuresFlagsBoxLabel"> Presence</label><br /> <input
+							type="checkbox" id="affSendGroupChatBreakoutToNonSubSMS"
+							name="ffSendGroupChatBreakoutToNonSubSMS"
+							value="SendGroupChatBreakoutToNonSubSMS"> <label
+							class="featuresFlagsBoxLabel">
+							SendGroupChatBreakoutToNonSubSMS</label><br /> <input type="checkbox"
+							id="affAntiVirus" name="ffAntiVirus" value="AntiVirus"> <label
+							class="featuresFlagsBoxLabel"> AntiVirus</label><br /> <input
+							type="checkbox" id="affSecureComms" name="ffSecureComms"
+							value="SecureComms"> <label class="featuresFlagsBoxLabel">
+							SecureComms</label><br /> <input type="checkbox" id="affStoreAndForward"
+							name="ffStoreAndForward" value="StoreAndForward"> <label
+							class="featuresFlagsBoxLabel"> StoreAndForward</label><br />
+							 <input type="checkbox" id="affStandAloneMsgAuth"
+                                                        name="ffStandAloneMsgAuth" value="StandAloneMsgAuth"> <label
+                                                        class="featuresFlagsBoxLabel"> StandAlone Msg Auth</label><br />
+
+					</div>
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSetFeaturesForm" type="submit" value="Submit">
+			</div>
+		</form>
+	</div>
+
+
+
+	<div id="updateConfigurationFormContainer" class="hiddenForm">
+		<!--The UpdateConfiguration Form -->
+		<div class="overlayFormHeader">
+			<h3>Update Configuration</h3>
+		</div>
+		<form id="updateConfigurationForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<label class="formLabel">Update Configuration</label> <span
+						class="required">*</span> <input type="hidden" name="msisdn"
+						value=""> <input type="hidden" name="userAgent" value="">
+					<input type="hidden" name="sipInstance" value=""> <input
+						type="hidden" name="updateConfig" value="">
+					<!--
+ 
+              <input id="updateConfigurationRequired" type="radio" name="updateConfig" value="true">Required
+              <input id="updateConfigurationNotRequired" type="radio" name="updateConfig" value="false">Not Required
+              -->
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel">
+				<!--
+          <input id="submitUpdateConfigurationForm" type="submit" value="Submit">
+           -->
+
+			</div>
+		</form>
+	</div>
+
+
+	<div id="schdMsgDeliveryAttemptFormContainer" class="hiddenForm">
+		<!--The Schedule Message Delivery  Form -->
+		<div class="overlayFormHeader">
+			<h3>Schedule Message Delivery Attempt</h3>
+		</div>
+		<form id="schdMsgDeliveryAttemptForm" name="input" method="post">
+			<div class="overlayFormBody">
+				<div class="formGrouping">
+					<label class="formLabel" for="schdMsgDelValue">Time Period
+						(seconds)</label> <span class="required">*</span> <input type="hidden"
+						name="aor" value=""> <input id="schdMsgDelValue"
+						type="text" name="deliveryTime">
+				</div>
+			</div>
+			<br />
+			<div class="overlayFormFooter">
+				<input type="hidden" name="gateway" value=""> <input
+					class="closeOverlay" type="reset" value="Cancel"> <input
+					id="submitSchdMsgDeliveryAttemptForm" type="submit" value="Submit">
+				<span id="schdMsgDeliveryAttemptErrorMessage" class="errorMessage"></span>
+			</div>
+		</form>
+	</div>
+
+	<div id="wrapper" class="noclick">
+		<!-- The Header Section -->
+		<div id="title">Customer Service Portal</div>
+		<div id="header">
+			<form id="lookupAccountForm" method="get">
+			       <input id="lookupInput" type="text" name="search" placeholder="Lookup By Msisdn or Imsi">
+          <button id="lookupInputSubmit">Submit</button>
+      </form>
+			<div id="blockUsersLink">
+			<button id="blockUsers" class="operation displayForm" onclick="location.href='/blockMessagesPortal'">Block Users</button> 	
+			</div>	
+			<button id="createAccount" class="operation displayForm">Create	New Account</button> 
+		
+			<span id="lookupErrorMessage" class="errorMessage"></span>
+		</div>
+
+		<!-- The Location Section -->
+		<div id="location" class="subSection">
+			<h2 id="locationHeader" class="subSectionHeader">Location</h2>
+			<div id="locationSectionBody" class="subSectionBody"></div>
+		</div>
+
+		<!-- The Accounts Section -->
+		<div id="accounts" class="subSection">
+			<h2 id="accountHeader" class="subSectionHeader">Account</h2>
+			<div class="subSectionOperations subSectionAccountOperations">
+				  <a href="#" id="deleteAccountOperation" class="operation">Delete Account</a> 
+					<a href="#" id="setPassword" class="operation displayForm">Set Password</a> 
+					<a href="#" id="setTos" class="operation displayForm">TOS Options</a> 
+					<a href="#" id="setBilling" class="operation displayForm">Set Billing</a> 
+					<a href="#" id="setRoutingPolicyID"	class="operation displayForm">Set Routing Policy ID</a> 
+					<a href="#"	id="setConfiguration" class="operation displayForm">Set	Configuration</a>
+					<a href="#"	id="setConfigurationId" class="operation displayForm">Set Configuration Id</a>
+					<a href="#"	id="setRcsState" class="operation displayForm">Set RCS State</a> 
+					<a href="#"	id="setImsVersion" class="operation displayForm">Set IMS State</a>
+					<a href="#" id="setFeatures" class="operation displayForm">Set Features</a>  
+					<a href="#" id="sendSms" class="operation displayForm">Send NRCR SMS</a> 
+					<a href="#" id="resendOtp" class="operation displayForm">Resend OTP</a>
+					<a href="#" id="deleteOtp" class="operation displayForm">Delete OTP</a>
+			</div>
+			<div id="accountSectionBody" class="subSectionBody"></div>
+		</div>
+
+
+
+  <div id="wildcardResultsDisplay">
+    <table id="wildcardResults" class="display compact" cellspacing="0" width="100%">
+    </table>
+  </div>
+  
+		<!-- The Devices Section -->
+		<div id="devices" class="subSection">
+			<h2 id="deviceHeader" class="subSectionHeader">Devices</h2>
+			<div class="subSectionOperations subSectionDeviceOperations">
+				<a href="#" id="deleteDevices" class="operation">Delete Devices</a>
+			</div>
+			<div id="deviceSectionBody" class="subSectionBody"></div>
+		</div>
+
+
+		<!-- The Registrations Section -->
+		<div id="registrations" class="subSection">
+			<h2 id="registrationHeader" class="subSectionHeader">Registrations</h2>
+			<div class="subSectionOperations subSectionRegistrationOperations">
+				<a href="#" id="deleteBindings" class="operation">Delete Bindings</a>
+
+			</div>
+			<div id="registrationSectionBody" class="subSectionBody"></div>
+		</div>
+		<!-- The Messages Section -->
+		<div id="messages" class="subSection">
+			<h2 id="messageHeader" class="subSectionHeader">Messages Stored for Store & Forward</h2>
+			<div class="subSectionOperations subSectionMessageOperations">
+				<a href="#" id="deleteMessages" class="operation">Delete
+					Messages</a> <a href="#" id="schdMsgDeliveryAttempt"
+					class="operation displayForm">Schedule Message Delivery Attempt</a>
+			</div>
+			<div id="messageSectionBody" class="subSectionBody"></div>
+		</div>
+	</div>
+	<!-- end of the wrapper-->
+	<div id="overlay"></div>
+	<div id="overlayDisabled"></div>
+</body>
+
+</html>
+
