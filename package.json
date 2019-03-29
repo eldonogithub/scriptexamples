@@ -1,0 +1,27 @@
+{
+  "name": "scriptexamples",
+  "version": "1.0.0",
+  "description": "script examples",
+  "main": "index.js",
+  "dependencies": {
+    "css-loader": "^0.28.4",
+    "datatables": "^1.10.13",
+    "file-loader": "^0.11.2",
+    "jquery": "^3.2.1",
+    "style-loader": "^0.18.2"
+  },
+  "devDependencies": {
+    "webpack": "^3.0.0"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": "git+https://github.com/eldonogithub/scriptexamples.git",
+  "keywords": [],
+  "author": "Eldon Olmstead <eldono@blackperl.ca>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/eldonogithub/scriptexamples/issues"
+  },
+  "homepage": "https://github.com/eldonogithub/scriptexamples#readme"
+}

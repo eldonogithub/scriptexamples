@@ -23,3 +23,8 @@ b.o: one.hh
 .PHONY: clean
 clean: 
 	$(RM) $(TARGETS) *.o
+
+all: main size empty segfault strings
+
+dist/bundle.js: package.json webpack.config.js src/index.js
+	webpack

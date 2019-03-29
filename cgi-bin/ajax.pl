@@ -76,7 +76,7 @@ sub process {
 
   # object to pass back as JSON
   my $db = {
-    "draw" => '"' . int( $cgi->param("draw") ) . '"',
+    "draw" => int( $cgi->param("draw") ),
 
     #  "recordsTotal" => $total,
     "status" => "Success"
@@ -146,7 +146,7 @@ if ($@) {
 
   my $error = escape_html($@);
   my $json = {
-    "draw" => '"' . int( $cgi->param("draw") ) . '"',
+    "draw" => int( $cgi->param("draw") ),
     "data" => [],
     "recordsFiltered" => 0,
     "status" => "Failed",
