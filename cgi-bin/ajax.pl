@@ -3,7 +3,7 @@
 use strict;
 use warnings FATAL => "all";
 
-use local::lib('/home/eldon.olmstead/examples/cgi-bin/perl5');
+use local::lib('/home/eldon.olmstead/scriptexamples/cgi-bin/perl5');
 
 use Template;
 use JSON;
@@ -14,6 +14,8 @@ use CGI;
 my $cgi = CGI->new();
 
 sub process {
+  my ( $draw ) = @_;
+
   # Create Template Toolkit reference.
   my $tt = Template->new(
     'STRICT' => 1,
@@ -76,7 +78,7 @@ sub process {
 
   # object to pass back as JSON
   my $db = {
-    "draw" => int( $cgi->param("draw") ),
+    "draw" => '"' . int( $draw ) . '"',
 
     #  "recordsTotal" => $total,
     "status" => "Success"
@@ -88,8 +90,8 @@ sub process {
     print STDERR "Filtering imsi by: $search\n";
   }
 
-  my $start  = int( $cgi->param('start') );
-  my $length = int( $cgi->param('length') );
+  my $start  = int( $cgi->param('start')||0 );
+  my $length = int( $cgi->param('length')||100 );
   my $end    = $start + $length - 1;
 
   my @filtered;
@@ -139,23 +141,27 @@ sub process {
 }
 
 my $content;
-eval { $content = process(); };
+
+my $draw = $cgi->param("draw") || 0;
+
+eval { $content = process($draw); };
 
 if ($@) {
   use HTML::Escape qw/escape_html/;
 
-  my $error = escape_html($@);
+  my $error = escape_html($@) || "";
   my $json = {
-    "draw" => int( $cgi->param("draw") ),
+    "draw" => '"' . int( $draw ) . '"',
     "data" => [],
     "recordsFiltered" => 0,
     "status" => "Failed",
     "error" => $error,
   };
 
-  my $dbobj = new JSON;
+  my $dbobj = JSON->new();
   $content = $dbobj->pretty(1)->encode($json);
 }
+
 my $content_length = length($content);
 
 print "Status: 200 Ok\r\n";
