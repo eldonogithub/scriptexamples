@@ -40,7 +40,7 @@ function unlock() {
 }
 
 function echoExit() {
-  if [ $# -ne 1 ]; then
+  if [[ $# -ne 1 ]]; then
     echo "Error: Invalid number of arguments" >&2
     echo "Usage: echoExit MESSAGE" 
     exit 1;
@@ -86,12 +86,12 @@ function lock_old () {
 #
 function unlock_old () {
     lock=/tmp/$identity.$CURRENT_USER
-    if [ -f $lock.lock ] && [ "$($CAT $lock.lock 2>/dev/null)" = "$$" ]; then
+    if [[ -f $lock.lock ]] && [[ "$($CAT $lock.lock 2>/dev/null)" = "$$" ]]; then
         $RM -f $lock.$$ $lock.lock
     fi
 }
 
-if [ $# -ne 1 ]; then
+if [[ $# -ne 1 ]]; then
   usage
   exit 1
 fi
@@ -100,7 +100,7 @@ lock || echoExit "$1 unavailable";
 
 echo "$1 locked"
 
-sleep 1
+sleep 100
 
 unlock || echoExit "$1 unlock failed";
 
